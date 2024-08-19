@@ -63,4 +63,19 @@ router.get('/home', (req, res) => {
   }
 });
 
+router.get('/username', async (req, res) => {
+  const token = req.header('Authorization').replace('Bearer ', '');
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    res.json({ username: user.username });
+  } catch (err) {
+    res.status(401).send('Unauthorized');
+  }
+});
+
 module.exports = router;
